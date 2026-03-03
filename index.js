@@ -1,22 +1,26 @@
-// Version 1.2: Added configuration and multi-language support
+// Version 2.0: Modular Architecture Integration
+const { formatTimestamp, getStatusMessage } = require('./change.js');
+
 const config = {
   projectName: "Git Practice Lab",
-  version: "1.2.0",
+  version: "2.0.0",
   language: "EN"
 };
 
-const today = new Date().toLocaleDateString();
+const sessionTime = formatTimestamp(new Date());
 
-function greetUser(name, lang = "EN") {
+function greetUser(name, lang = config.language) {
   const greetings = {
     EN: "Welcome",
     ES: "Bienvenido",
-    FR: "Bienvenue"
+    FR: "Bienvenue",
+    DE: "Willkommen" // Added German support
   };
   const greet = greetings[lang] || greetings.EN;
   return `${greet} to the ${config.projectName}, ${name}!`;
 }
 
-console.log(`--- Session Started: ${today} ---`);
-console.log(greetUser("Developer", config.language));
-console.log(`Status: Active | Version: ${config.version}`);
+console.log(`>>> [SYSTEM LOG] ${sessionTime}`);
+console.log(getStatusMessage('success'));
+console.log(greetUser("Lead Developer"));
+console.log(`Build: v${config.version}`);

@@ -1,20 +1,31 @@
-// change.js - Utility module for Git practice
+// change.js - Utility module Version 2.0
 /**
- * Simple utility to format strings or numbers
- * This helps us practice multi-file commits!
+ * Enhanced utility module with improved formatting
+ * and error handling.
  */
 
 const formatTimestamp = (date) => {
-  return new Date(date).toTimeString().split(' ')[0];
+  const options = { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false };
+  return new Date(date).toLocaleTimeString('en-GB', options);
 };
 
 const getStatusMessage = (status) => {
   const statuses = {
-    success: "✅ Operation Successful",
-    error: "❌ Error Detected",
-    pending: "⏳ Processing..."
+    success: "✅ SYSTEM_READY",
+    error: "❌ SYSTEM_FAILURE",
+    pending: "⏳ SYSTEM_INITIALIZING",
+    warning: "⚠️ SYSTEM_UNSTABLE" // New status added
   };
-  return statuses[status] || "Unknown Status";
+  return statuses[status.toLowerCase()] || "UNKNOWN_STATE";
 };
 
-module.exports = { formatTimestamp, getStatusMessage };
+// New Utility Function
+const generateSessionID = () => {
+  return `SID-${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
+};
+
+module.exports = {
+  formatTimestamp,
+  getStatusMessage,
+  generateSessionID
+};
