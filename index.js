@@ -1,12 +1,22 @@
-// Version 1.1: Added a timestamp for better logging
-const projectName = "Git Practice Lab";
-const version = "1.0.0";
+// Version 1.2: Added configuration and multi-language support
+const config = {
+  projectName: "Git Practice Lab",
+  version: "1.2.0",
+  language: "EN"
+};
+
 const today = new Date().toLocaleDateString();
 
-function greetUser(name) {
-  return `Welcome to the ${projectName}, ${name}!`;
+function greetUser(name, lang = "EN") {
+  const greetings = {
+    EN: "Welcome",
+    ES: "Bienvenido",
+    FR: "Bienvenue"
+  };
+  const greet = greetings[lang] || greetings.EN;
+  return `${greet} to the ${config.projectName}, ${name}!`;
 }
 
-console.log(`System Initialized on ${today}...`);
-console.log(greetUser("Developer"));
-console.log(`Current Version: ${version}`);
+console.log(`--- Session Started: ${today} ---`);
+console.log(greetUser("Developer", config.language));
+console.log(`Status: Active | Version: ${config.version}`);
