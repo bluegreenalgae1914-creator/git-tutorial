@@ -1,67 +1,107 @@
-// change.js - Utility module Version 2.2
+// change.js - Utility module Version 3.0 (Universal: Browser + Node)
+
 /**
- * Added configurable locale support,
- * extensible status registry,
- * and stronger session ID generation.
+ * Features:
+ * - Configurable locale support
+ * - Extensible status registry
+ * - Strong session ID generation (Node + Browser)
+ * - Universal module support (Node + Browser)
  */
 
-// Internal status registry (extensible)
-const statusRegistry = {
-  success: "✅ SYSTEM_READY",
-  error: "❌ SYSTEM_FAILURE",
-  pending: "⏳ SYSTEM_INITIALIZING",
-  warning: "⚠️ SYSTEM_UNSTABLE"
-};
-
-// Timestamp formatter with configurable locale
-const formatTimestamp = (date = new Date(), locale = "en-GB") => {
-  const parsedDate = new Date(date);
-
-  if (isNaN(parsedDate)) {
-    throw new Error("Invalid date provided to formatTimestamp()");
+(function (root, factory) {
+  if (typeof module === "object" && module.exports) {
+    // Node / CommonJS
+    module.exports = factory();
+  } else {
+    // Browser (window)
+    root.ChangeUtils = factory();
   }
+})(typeof globalThis !== "undefined" ? globalThis : this, function () {
+  "use strict";
 
-  const options = {
-    hour: '2-digit',
-    minute: '2-digit',
-    second: '2-digit',
-    hour12: false
+  // Internal status registry (extensible)
+  const statusRegistry = {
+    success: "✅ SYSTEM_READY",
+    error: "❌ SYSTEM_FAILURE",
+    pending: "⏳ SYSTEM_INITIALIZING",
+    warning: "⚠️ SYSTEM_UNSTABLE"
   };
 
-  return parsedDate.toLocaleTimeString(locale, options);
-};
+  // Timestamp formatter with configurable locale
+  const formatTimestamp = (date = new Date(), locale = "en-GB") => {
+    const parsedDate = new Date(date);
 
-// Extensible status handler
-const getStatusMessage = (status = "") => {
-  if (typeof status !== "string") {
-    return "INVALID_STATUS_TYPE";
-  }
+    if (isNaN(parsedDate)) {
+      throw new Error("Invalid date provided to formatTimestamp()");
+    }
 
-  return statusRegistry[status.toLowerCase()] || "UNKNOWN_STATE";
-};
+    const options = {
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+      hour12: false
+    };
 
-// Allow dynamic status registration (NEW)
-const registerStatus = (key, message) => {
-  if (!key || typeof key !== "string") {
-    throw new Error("Status key must be a string");
-  }
+    return parsedDate.toLocaleTimeString(locale, options);
+  };
 
-  statusRegistry[key.toLowerCase()] = message;
-};
+  // Extensible status handler
+  const getStatusMessage = (status = "") => {
+    if (typeof status !== "string") {
+      return "INVALID_STATUS_TYPE";
+    }
 
-// Stronger Session ID using crypto if available
-const generateSessionID = () => {
-  const randomPart =
-    typeof crypto !== "undefined" && crypto.randomUUID
-      ? crypto.randomUUID().split("-")[0]
-      : Math.random().toString(36).slice(2, 11);
+    return statusRegistry[status.toLowerCase()] || "UNKNOWN_STATE";
+  };
 
-  return `SID-${randomPart.toUpperCase()}`;
-};
+  // Allow dynamic status registration
+  const registerStatus = (key, message) => {
+    if (!key || typeof key !== "string") {
+      throw new Error("Status key must be a string");
+    }
 
-module.exports = Object.freeze({
-  formatTimestamp,
-  getStatusMessage,
-  registerStatus,
-  generateSessionID
+    statusRegistry[key.toLowerCase()] = message;
+  };
+
+  // Secure random string generator (Node + Browser)
+  const secureRandomString = () => {
+    // Browser crypto
+    if (typeof crypto !== "undefined") {
+      if (crypto.randomUUID) {
+        return crypto.randomUUID().split("-")[0];
+      }
+
+      if (crypto.getRandomValues) {
+        const array = new Uint32Array(1);
+        crypto.getRandomValues(array);
+        return array[0].toString(36);
+      }
+    }
+
+    // Node crypto
+    try {
+      const nodeCrypto = require?.("crypto");
+      if (nodeCrypto?.randomUUID) {
+        return nodeCrypto.randomUUID().split("-")[0];
+      }
+      return nodeCrypto.randomBytes(8).toString("hex");
+    } catch {
+      // Fallback (least secure)
+      return Math.random().toString(36).slice(2, 11);
+    }
+  };
+
+  // Session ID generator
+  const generateSessionID = () => {
+    const randomPart = secureRandomString();
+    return `SID-${randomPart.toUpperCase()}`;
+  };
+
+  // Public API
+  return Object.freeze({
+    formatTimestamp,
+    getStatusMessage,
+    registerStatus,
+    generateSessionID
+  });
 });
