@@ -1,12 +1,30 @@
-// Version 1.1: Added a timestamp for better logging
-const projectName = "Git Practice Lab";
-const version = "1.0.0";
-const today = new Date().toLocaleDateString();
+// Version 1.3: Integrated utility module and session tracking (refined)
 
-function greetUser(name) {
+const {
+  formatTimestamp,
+  getStatusMessage,
+  generateSessionID
+} = require('./change.js');
+
+const projectName = "Git Practice Lab";
+const version = "1.3.0";
+
+const sessionID = generateSessionID();
+
+function greetUser(name = "User") {
   return `Welcome to the ${projectName}, ${name}!`;
 }
 
-console.log(`System Initialized on ${today}...`);
-console.log(greetUser("Developer"));
-console.log(`Current Version: ${version}`);
+// Improved structured logger (dynamic timestamp per log)
+function logMessage(message, type = "INFO") {
+  const timestamp = formatTimestamp();
+  const safeType = typeof type === "string" ? type.toUpperCase() : "INFO";
+
+  console.log(`[${safeType}] [${timestamp}] [${sessionID}] ${message}`);
+}
+
+// System Logs
+logMessage("System Boot Sequence Started", "system");
+logMessage(getStatusMessage("success"), "status");
+logMessage(greetUser("Developer"), "user");
+logMessage(`Build Version: v${version}`, "build");
