@@ -1,26 +1,12 @@
-// Version 2.0: Modular Architecture Integration
-const { formatTimestamp, getStatusMessage } = require('./change.js');
+// Version 1.1: Added a timestamp for better logging
+const projectName = "Git Practice Lab";
+const version = "1.0.0";
+const today = new Date().toLocaleDateString();
 
-const config = {
-  projectName: "Git Practice Lab",
-  version: "2.0.0",
-  language: "EN"
-};
-
-const sessionTime = formatTimestamp(new Date());
-
-function greetUser(name, lang = config.language) {
-  const greetings = {
-    EN: "Welcome",
-    ES: "Bienvenido",
-    FR: "Bienvenue",
-    DE: "Willkommen" // Added German support
-  };
-  const greet = greetings[lang] || greetings.EN;
-  return `${greet} to the ${config.projectName}, ${name}!`;
+function greetUser(name) {
+  return `Welcome to the ${projectName}, ${name}!`;
 }
 
-console.log(`>>> [SYSTEM LOG] ${sessionTime}`);
-console.log(getStatusMessage('success'));
-console.log(greetUser("Lead Developer"));
-console.log(`Build: v${config.version}`);
+console.log(`System Initialized on ${today}...`);
+console.log(greetUser("Developer"));
+console.log(`Current Version: ${version}`);
